@@ -4,8 +4,8 @@ import pyglet
 from pyglet.window import key
 from core import GameElement
 
-SCREEN_X = 800
-SCREEN_Y = 700
+SCREEN_X = 1300
+SCREEN_Y = 1000
 
 game_window = pyglet.window.Window(SCREEN_X, SCREEN_Y)
 
@@ -43,7 +43,7 @@ def setup_images():
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
 
-            "GG": "GG_Bridge.png",
+            "GG": "gg_bridge_with_water.png",
             "BB": "BB_Coffee.png",
             "Sushi": "sushirrito.jpg",
             "Sibbys": "sibbys.png",
@@ -78,25 +78,45 @@ class Board(object):
 
 
         # Make a map with a stoneblock border and filled with grass
+        # game_map = []
+        # inner_width = width-2
+        # for i in range(height):
+        #     if i == 0 or i == height-1:
+        #         # On the boundaries
+        #         game_map.append(["Block"] * width)
+        #     elif i == 3:
+        #         game_map.append((["WaterBlock"] * 3) + ["Block"] + (["WaterBlock"] * (width - 3 - 1)))
+        #     else:
+        #         row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
+        #         game_map.append(row)
+
         game_map = []
-        inner_width = width-2
-        for i in range(height):
-            if i == 0 or i == height-1:
-                # On the boundaries
-                game_map.append(["Block"] * width)
-            elif i == 3:
-                game_map.append((["WaterBlock"] * 3) + ["Block"] + (["WaterBlock"] * (width - 3 - 1)))
-            else:
-                row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
-                game_map.append(row)
+        f = open("SF_map.txt")
+        for line in f:
+            print line
+            row = []
+            for item in range(len(line)):
+                if line[item] == 's':
+                    row = row + ["Block"]
+                if line[item] == 'w':
+                    row = row + ["WaterBlock"]
+                if line[item] == '.':
+                    row = row + ["GrassBlock"]
+                if line[item] == 'b':
+                    row = row + ["GG"]
+            game_map.append(row)
+        f.close()
         
+
+        # for some reason, the map does not generate the last row. Off by one error somewhere?
         self.base_board = game_map
         self.content_layer = []
         row = [ None ] * width
         for y in range(height):
             self.content_layer.append(list(row))
 
-        self.message = pyglet.text.Label(text = "", x=10, y=SCREEN_Y-30)
+        self.message = pyglet.text.Label(text = "", x=10, y=SCREEN_Y-20, multiline=True, width=700)
+        # self.message = pyglet.text.Label(text = "", x=10, y=SCREEN_Y-30)
         self.bg_sprites = []
 
         for y in range(height):
