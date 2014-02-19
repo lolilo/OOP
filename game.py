@@ -14,14 +14,12 @@ Hackbright Academy will not welcome you inside unless you have acquired enough f
 
 # Wait, you forgot to pick up gluten free options! Shannon and Cynthia send you back out. 
 # -- then new/old options will appear
-# make the cart move
 
 #### DO NOT TOUCH ####
 GAME_BOARD = None
 DEBUG = False
 KEYBOARD = None
 PLAYER = None
-CART_TIMER = 0
 ######################
 
 GAME_WIDTH = 12
@@ -39,19 +37,19 @@ class BB(GameElement):
     IMAGE = "BB"
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just acquired BlueBottle Coffee! You have %d items!"%(len(player.inventory)))
-
-class CB_Cart(GameElement):
-    IMAGE = "CremeBrulee"
-    def interact(self, player):
-            player.inventory.append(self)
-            GAME_BOARD.draw_msg("You caught up with the Creme Brulee Cart! You have %d items!"%(len(player.inventory)))
+            GAME_BOARD.draw_msg("You just acquired BlueBottle Coffee! You have %d items!" % (len(player.inventory)))
 
 class Sibbys(GameElement):
     IMAGE = "Sibbys"
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just acquired Sibby's cupcakes! You make sure to pick up some gluten-free options. You have %d items!"%(len(player.inventory)))
+            GAME_BOARD.draw_msg("You just acquired Sibby's cupcakes! You make sure to pick up some gluten-free options. You have %d items!" % (len(player.inventory)))
+
+class Sushi(GameElement):
+    IMAGE = "Sushi"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("Whoa, you waited in that Sushirrito line?! Dang. You have %d items!" % (len(player.inventory)))
 
 
 # Could also combine the following to a single class "Obstacle" or something. 
@@ -61,11 +59,29 @@ class GG_Bridge(GameElement):
 
 class HB(GameElement):
     IMAGE = "HB"
+    SOLID = True
+    def interact(self, player):
+    # if at Hackbright, check your inventory
+        if len(PLAYER.inventory) < 5:
+            GAME_BOARD.draw_msg("You have not gathered enough food. Hackbright students need more!")
+            GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+            # food_quota = False
+        elif 5 <= len(PLAYER.inventory) <= 6:
+            GAME_BOARD.draw_msg("Wait, you forgot about Shannon's and Cynthia's gluten alleries! You can't leave them to starve.")
+            GAME_BOARD.set_el(self.x + 6, self.y + 1, GAME_BOARD.entities['cash'])
+            # food_quota = False
+        else:
+            GAME_BOARD.draw_msg("You collected enough food for Hackbright to welcome you in. Congratulations!")
 
-# Cart will move! 
 class Cart(GameElement):
     IMAGE = "CremeBrulee"
 
+    def interact(self, player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You caught up with the Creme Brulee Cart! You have %d items!" % (len(player.inventory)))
+        GAME_BOARD.entities['cb_cart_moving'] = False
+
+    # cart can move! 
     def movement(self):
         i = randint(1, 4)
 
@@ -86,9 +102,11 @@ class Cart(GameElement):
             next_y = self.y + 1
 
         # cart must only move within the lower half of the screen
-        if 0 <= next_x < GAME_WIDTH and 5 <= next_y < GAME_HEIGHT:
-            GAME_BOARD.del_el(self.x, self.y)
-            GAME_BOARD.set_el(next_x, next_y, self)
+        if (0 <= next_x < GAME_WIDTH and 5 <= next_y < GAME_HEIGHT):
+            existing_el = GAME_BOARD.get_el(next_x, next_y)
+            if existing_el is None or not existing_el.SOLID:
+                GAME_BOARD.del_el(self.x, self.y)
+                GAME_BOARD.set_el(next_x, next_y, self)
 
 class Money(GameElement):
     def interact(self, player):
@@ -129,26 +147,19 @@ class Character(GameElement):
 
         bridge_toll = True
         if next_x == 2 and next_y == 4:
-            print self.inventory
-            print cash
-            if cash in self.inventory:
+            # print self.inventory
+            # cash is a gloal variable
+            if GAME_BOARD.entities['cash'] in self.inventory:
                 GAME_BOARD.draw_msg("You crossed the Golden Gate Bridge!")
             else: 
                 GAME_BOARD.draw_msg("You need to pay bridge toll in order to cross the Golden Gate Bridge.")
                 bridge_toll = False
 
-        food_quota = True
-        # if at Hackbright, check your inventory
-        if next_x == 10 and next_y == 7:
-            if len(self.inventory) < 5:
-                GAME_BOARD.draw_msg("You have not gathered enough food. Hackbright students need more!")
-                food_quota = False
-            else:
-                GAME_BOARD.draw_msg("You collected enough food for Hackbright to welcome you in. Congratulations!")
+        
         # if boundary_boolean:
         #     print "It's going to break! Don't move!"
 
-        if not out_of_bounds and not on_water and bridge_toll and food_quota:
+        if not out_of_bounds and not on_water and bridge_toll:
 
             if direction == "up":
                 return (self.x, self.y - 1)
@@ -176,37 +187,56 @@ def initialize():
     rocks = []
 
 ########## IMAGES ############
-    bluebottle = BB()
-    GAME_BOARD.register(bluebottle)
 
-    global cb_cart
+    # GAME_BOARD is global, so all its attributes are available globally via GAME_BOARD
+    GAME_BOARD.entities = {}
+
+    GAME_BOARD.entities['bluebottle'] = BB()
+    GAME_BOARD.register(GAME_BOARD.entities['bluebottle'])
+    
+
+    # instead of having a bunch of global variables, store them all in a dictionary 
+    # This way, it can easily be passed, destroyed, or otherwise managed
+
     cb_cart = Cart()
+    # addting cb_cart to global data structure
+    GAME_BOARD.entities['cb_cart'] = cb_cart
+    GAME_BOARD.entities['cb_cart_moving'] = True
     GAME_BOARD.register(cb_cart)
+    # need to initialize cart_timer at the start of game
+    CART_TIMER = 0 
+    GAME_BOARD.entities['cb_cart_timer'] = CART_TIMER
 
     sibbys = Sibbys()
     GAME_BOARD.register(sibbys)
 
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), bluebottle)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), cb_cart)
+    sushi = Sushi()
+    GAME_BOARD.register(sushi)
+
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), bluebottle)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+    # need to fix .png image size
+    # GAME_BOARD.set_el(5, 8, sushi)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), cb_cart)
 
     hackbright = HB()
     GAME_BOARD.register(hackbright)
-    GAME_BOARD.set_el(10, 7, hackbright)
+    GAME_BOARD.set_el(1, 1, hackbright)
 
     # cash must be global in order to check for it in the player's inventory in the Character class.
-    global cash
     cash = Money()
+    GAME_BOARD.entities['cash'] = cash
     GAME_BOARD.register(cash)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), cash)
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), cash)
     # print 'this is cash', cash
     # print type(cash)
 
 
 ########## IMAGES ############
-
 
     # In the initialize function
     global PLAYER
@@ -215,7 +245,7 @@ def initialize():
     GAME_BOARD.set_el(2, 2, PLAYER)
     print 'this is player', PLAYER
 
-    welcome_message = "Collect all the food you see and deliver to starving Hackbright students!"
+    welcome_message = "Your friends at Hackbright Academy have been coding all day and are now starving! You decide to trek out and fetch food for everyone."
     GAME_BOARD.draw_msg(welcome_message)    
 
 
@@ -247,11 +277,11 @@ def keyboard_handler():
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
 
-    global CART_TIMER    
-    mod_divisor = 10
-    CART_TIMER += 1
-    if CART_TIMER % mod_divisor == 0:
-        cb_cart.movement()
+
+    mod_divisor = 8
+    GAME_BOARD.entities['cb_cart_timer'] += 1
+    if GAME_BOARD.entities['cb_cart_timer'] % mod_divisor == 0 and GAME_BOARD.entities['cb_cart_moving']:
+        GAME_BOARD.entities['cb_cart'].movement()
 
     # elif KEYBOARD[key.SPACE]:
     #     GAME_BOARD.erase_msg()

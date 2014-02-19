@@ -45,7 +45,7 @@ def setup_images():
 
             "GG": "gg_bridge_with_water.png",
             "BB": "BB_Coffee.png",
-            "Sushi": "sushirrito.jpg",
+            "Sushi": "sushirrito.png",
             "Sibbys": "sibbys.png",
             "Philz": "philz.jpg",
             "CremeBrulee": "CB_cart.png",
@@ -93,7 +93,6 @@ class Board(object):
         game_map = []
         f = open("SF_map.txt")
         for line in f:
-            print line
             row = []
             for item in range(len(line)):
                 if line[item] == 's':
