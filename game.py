@@ -31,17 +31,29 @@ class Rock(GameElement):
     SOLID = True
 
 class BB(GameElement):
-    IMAGE = "Chest"
+    IMAGE = "BB"
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("You just acquired food! You have %d items!"%(len(player.inventory)))
 
-class HB(GameElement):
-    IMAGE = "Rock"
+class CB_Cart(GameElement):
+    IMAGE = "CremeBrulee"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("You just acquired food! You have %d items!"%(len(player.inventory)))
 
+class Sibbys(GameElement):
+    IMAGE = "Sibbys"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("You just acquired food! You have %d items!"%(len(player.inventory)))
+
+
+class HB(GameElement):
+    IMAGE = "HB"
 
 class Cart(GameElement):
-    IMAGE = "Heart"
+    IMAGE = "CremeBrulee"
 
 
 class Character(GameElement):
@@ -142,11 +154,19 @@ def initialize():
 
     bluebottle = BB()
     GAME_BOARD.register(bluebottle)
+
+
+    cb_cart = CB_Cart()
+    GAME_BOARD.register(cb_cart)
+
+
+    sibbys = Sibbys()
+    GAME_BOARD.register(sibbys)
     # print randint(0, GAME_WIDTH)
     # print randint(0, GAME_HEIGHT)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(4, GAME_HEIGHT - 1), cb_cart)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), sibbys)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(4, GAME_HEIGHT - 1), bluebottle)
 
@@ -154,9 +174,9 @@ def initialize():
     GAME_BOARD.register(hackbright)
     GAME_BOARD.set_el(7, 7, hackbright)
 
-    cart = Cart()
-    GAME_BOARD.register(cart)
-    GAME_BOARD.set_el(randint)
+    # cart = Cart()
+    # GAME_BOARD.register(cart)
+    # GAME_BOARD.set_el(randint)
 
     # for rock in rocks: 
     #     print rock

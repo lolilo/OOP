@@ -43,12 +43,14 @@ def setup_images():
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
 
-            "GG": "gg_bridge.jpg",
-            "BB": "bluebottle.jpg",
+            "GG": "GG_Bridge.png",
+            "BB": "BB_Coffee.png",
             "Sushi": "sushirrito.jpg",
-            "Sibbys": "sibbys.jpg",
+            "Sibbys": "sibbys.png",
             "Philz": "philz.jpg",
-            "CremeBrulee": "cremebrulee.png"
+            "CremeBrulee": "CB_cart.png",
+
+            "HB": 'HB.png'
             }
 
     for k,v in filenames.items():
