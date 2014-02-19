@@ -25,6 +25,7 @@ def setup_images():
             "Block": "Plain Block.png",
             "GrassBlock": "Grass Block.png",
             "StoneBlock": "Stone Block.png",
+            "WaterBlock": 'Water Block.png',
             "ShortTree": "Tree Short.png",
             "TallTree": "Tree Tall.png",
             "Rock": "Rock.png",
@@ -40,7 +41,14 @@ def setup_images():
             "Cat": "Character Cat Girl.png",
             "Horns": "Character Horn Girl.png",
             "Girl": "Character Pink Girl.png",
-            "Princess": "Character Princess Girl.png"
+            "Princess": "Character Princess Girl.png",
+
+            "GG": "gg_bridge.jpg",
+            "BB": "bluebottle.jpg",
+            "Sushi": "sushirrito.jpg",
+            "Sibbys": "sibbys.jpg",
+            "Philz": "philz.jpg",
+            "CremeBrulee": "cremebrulee.png"
             }
 
     for k,v in filenames.items():
@@ -74,6 +82,8 @@ class Board(object):
             if i == 0 or i == height-1:
                 # On the boundaries
                 game_map.append(["Block"] * width)
+            elif i == 3:
+                game_map.append((["WaterBlock"] * 3) + ["Block"] + (["WaterBlock"] * (width - 3 - 1)))
             else:
                 row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
                 game_map.append(row)

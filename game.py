@@ -3,6 +3,17 @@ import pyglet
 from pyglet.window import key
 from core import GameElement
 import sys
+from random import randint
+
+
+"""
+You have just arrived in the Bay Area and you're super excited to try all the foods that 
+Bay Area has to offer. Navigate the map to collect all the delicious foods and bring it 
+to starving Hackbright students. 
+
+If you do not collect enough food for Hackbright, they will send you back out.
+"""
+
 
 #### DO NOT TOUCH ####
 GAME_BOARD = None
@@ -11,13 +22,27 @@ KEYBOARD = None
 PLAYER = None
 ######################
 
-GAME_WIDTH = 5
-GAME_HEIGHT = 5
+GAME_WIDTH = 8
+GAME_HEIGHT = 8
 
 #### Put class definitions here ####
 class Rock(GameElement):
     IMAGE = "Rock"
     SOLID = True
+
+class BB(GameElement):
+    IMAGE = "Chest"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("You just acquired food! You have %d items!"%(len(player.inventory)))
+
+class HB(GameElement):
+    IMAGE = "Rock"
+
+
+class Cart(GameElement):
+    IMAGE = "Heart"
+
 
 class Character(GameElement):
     IMAGE = "Girl"
@@ -45,11 +70,35 @@ class Character(GameElement):
 
         # boundary_boolean returns True if it's not safe to move ahead
         out_of_bounds = (next_x < 0 or next_y < 0) or (next_x > GAME_WIDTH - 1 or next_y > GAME_HEIGHT - 1)
+        # on_water returns True if player is about to move onto water
+        on_water = next_x != 3 and next_y == 3
 
+    # cash
+    # list =[a,b,c]
+    # for i in list:
+    #     if type(i) == type(cash)
+
+        bridge_toll = True
+        if next_x == 3 and next_y == 3:
+            print self.inventory
+            print cash
+            if cash in self.inventory:
+                GAME_BOARD.draw_msg("You crossed the Golden Gate Bridge!")
+            else: 
+                GAME_BOARD.draw_msg("You need to pay bridge toll in order to cross the Golden Gate Bridge.")
+                bridge_toll = False
+
+        food_quota = True
+        if next_x == 7 and next_y == 7:
+            if len(self.inventory) < 5:
+                GAME_BOARD.draw_msg("This is not enough food. Hackbright students need more!")
+                food_quota = False
+            else:
+                GAME_BOARD.draw_msg("You have made all the Hackbright students' tummies very happy!")
         # if boundary_boolean:
         #     print "It's going to break! Don't move!"
 
-        if not out_of_bounds:
+        if not out_of_bounds and not on_water and bridge_toll and food_quota:
 
             if direction == "up":
                 return (self.x, self.y - 1)
@@ -62,10 +111,10 @@ class Character(GameElement):
         
         return (self.x, self.y)
 
-class Gem(GameElement):
+class Money(GameElement):
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just acquired a gem! You have %d items!"%(len(player.inventory)))
+            GAME_BOARD.draw_msg("You just acquired money! You have %d items!"%(len(player.inventory)))
     IMAGE = "BlueGem"
     SOLID = False
 
@@ -78,35 +127,57 @@ def initialize():
     rock_positions = [
     (2, 1),
     (1, 2),
-    (3, 2),
-    (2, 3)
+    (3, 2)
     ]
 
     rocks = []
 
-    for pos in rock_positions:
-        rock = Rock()
-        GAME_BOARD.register(rock)
-        GAME_BOARD.set_el(pos[0], pos[1], rock)
-        rocks.append(rock)
+    # for pos in rock_positions:
+    #     rock = Rock()
+    #     GAME_BOARD.register(rock)
+    #     GAME_BOARD.set_el(pos[0], pos[1], rock)
+    #     rocks.append(rock)
 
-    rocks[-1].SOLID = False
+    # rocks[-1].SOLID = False
 
-    for rock in rocks: 
-        print rock
+    bluebottle = BB()
+    GAME_BOARD.register(bluebottle)
+    # print randint(0, GAME_WIDTH)
+    # print randint(0, GAME_HEIGHT)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), bluebottle)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(4, GAME_HEIGHT - 1), bluebottle)
+
+    hackbright = HB()
+    GAME_BOARD.register(hackbright)
+    GAME_BOARD.set_el(7, 7, hackbright)
+
+    cart = Cart()
+    GAME_BOARD.register(cart)
+    GAME_BOARD.set_el(randint)
+
+    # for rock in rocks: 
+    #     print rock
 
     # In the initialize function
     global PLAYER
     PLAYER = Character()
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(2, 2, PLAYER)
-    print PLAYER
+    print 'this is player', PLAYER
 
-    # GAME_BOARD.draw_msg("This game is wicked awesome.")
+    welcome_message = "Collect all the food you see and deliver to starving Hackbright students!"
 
-    gem = Gem()
-    GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(3, 1, gem)
+    GAME_BOARD.draw_msg(welcome_message)
+
+    global cash
+    cash = Money()
+    GAME_BOARD.register(cash)
+    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 2), cash)
+    print 'this is cash', cash
+    print type(cash)
 
 
 def keyboard_handler():
@@ -123,6 +194,10 @@ def keyboard_handler():
 
     elif KEYBOARD[key.LEFT]:
         direction = 'left'
+
+
+# bridge is at (3,3). Can only cross bridge if cash is in inventory
+# must prevent player from walking on water. 
 
     if direction: 
         next_location = PLAYER.next_pos(direction)
@@ -189,3 +264,36 @@ def keyboard_handler():
     # print "The second rock is at", (rock2.x, rock2.y)
     # print "Rock 1 image", rock1.IMAGE
     # print "Rock 2 image", rock2.IMAGE
+
+
+
+
+# >>> class Pet():
+# ...     def __init__(self, name):
+# ...             self.name = name
+# ... 
+# >>> p = Pet("Fido")
+# >>> p2 = Pet("Fido")
+# >>> p == p2
+# False
+# >>> print p
+# <__main__.Pet instance at 0x7f8a6d32f2d8>
+# >>> print p2
+# <__main__.Pet instance at 0x7f8a6d32f320>
+# >>> p.name
+# 'Fido'
+# >>> p.name == p2.name
+# True
+# >>> class Pen();
+#   File "<stdin>", line 1
+#     class Pen();
+#                ^
+# SyntaxError: invalid syntax
+# >>> class Pen():
+# ...     def __repr__(self):
+# ...             return "Hi"
+# ... 
+# >>> pen = Pen()
+# >>> print pen
+# Hi
+
