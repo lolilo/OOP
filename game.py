@@ -60,16 +60,28 @@ class GG_Bridge(GameElement):
 class HB(GameElement):
     IMAGE = "HB"
     SOLID = True
+    # ASK SOMEONE: GAME_BOARD doesn't exist up here...hm.
+    # print GAME_BOARD.entities
+
     def interact(self, player):
     # if at Hackbright, check your inventory
         if len(PLAYER.inventory) < 5:
             GAME_BOARD.draw_msg("You have not gathered enough food. Hackbright students need more!")
-            GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
-            # food_quota = False
-        elif 5 <= len(PLAYER.inventory) <= 6:
-            GAME_BOARD.draw_msg("Wait, you forgot about Shannon's and Cynthia's gluten alleries! You can't leave them to starve.")
-            GAME_BOARD.set_el(self.x + 6, self.y + 1, GAME_BOARD.entities['cash'])
-            # food_quota = False
+            if GAME_BOARD.entities['more food'] == 0 and len(PLAYER.inventory) > 3:
+                GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+                GAME_BOARD.entities['more food'] = 1
+
+        elif 5 <= len(PLAYER.inventory) < 6:
+            if GAME_BOARD.entities['more food'] == 1:
+                GAME_BOARD.draw_msg("Wait, you forgot about Shannon's, Renee's, and Cynthia's gluten alleries! You can't leave them to starve.")
+                GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+                GAME_BOARD.entities['more food'] += 1
+
+        elif 6 <= len(PLAYER.inventory) < 7:
+            GAME_BOARD.draw_msg("Oh wait, Abigail and Liz are vegan...they won't let you in unless you bring them vegan food. :(")
+            if not GAME_BOARD.entities['bridge toll given']:
+                GAME_BOARD.set_el(self.x + 6, self.y + 1, GAME_BOARD.entities['cash'])
+                GAME_BOARD.entities['bridge toll given'] = True
         else:
             GAME_BOARD.draw_msg("You collected enough food for Hackbright to welcome you in. Congratulations!")
 
@@ -213,7 +225,10 @@ def initialize():
     sushi = Sushi()
     GAME_BOARD.register(sushi)
 
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+    upper_half_x = randint(0, GAME_WIDTH - 1)
+    upper_half_y = randint(0, 3)
+
+    GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
@@ -222,6 +237,12 @@ def initialize():
     # GAME_BOARD.set_el(5, 8, sushi)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), cb_cart)
+
+    # more_food in case for some reason not enough initial food generated
+    GAME_BOARD.entities['more food'] = True
+    # have you generated the bridge toll cash? 
+    GAME_BOARD.entities['bridge toll given'] = False
+
 
     hackbright = HB()
     GAME_BOARD.register(hackbright)
@@ -263,6 +284,10 @@ def keyboard_handler():
 
     elif KEYBOARD[key.LEFT]:
         direction = 'left'
+
+    elif KEYBOARD[key.I]:
+        GAME_BOARD.erase_msg()
+        GAME_BOARD.draw_msg("Inventory: %s" % PLAYER.inventory)
 
     if direction: 
         next_location = PLAYER.next_pos(direction)
