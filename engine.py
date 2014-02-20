@@ -99,11 +99,11 @@ class Board(object):
 
 
 
-        #This would make a great "read level" function
-        # map_title will be SF_map.txt and others
-        # def read_map(self, map_title):
+    #This would make a great "read level" function
+    # map_title will be SF_map.txt and others
+    def read_map(self, map_title):
         game_map = []
-        f = open('SF_map.txt')
+        f = open(map_title)
         for line in f:
             row = []
             for item in range(len(line)):
@@ -117,12 +117,13 @@ class Board(object):
                     row = row + ["GG"]
             game_map.append(row)
         f.close()
-        
 
+        # Why do I need to pass in self? It's because we're still within the class, huh? 
+        game_map = game_map
         self.base_board = game_map
         self.content_layer = []
-        row = [ None ] * width
-        for y in range(height):
+        row = [ None ] * self.width
+        for y in range(self.height):
             self.content_layer.append(list(row))
 
         self.message = pyglet.text.Label(text = "", x=10, y=SCREEN_Y-20, multiline=True, width=1200)
@@ -130,11 +131,9 @@ class Board(object):
         self.bg_sprites = []
 
 
-
-
         # This would make a great "draw background" function - this is what generates the map tiles
-        for y in range(height):
-            for x in range(width):
+        for y in range(self.height):
+            for x in range(self.width):
                 # game_map is a list of lists - y is the row, x is the index of the column
                 img_idx = game_map[y][x]
                 image = IMAGES[img_idx]

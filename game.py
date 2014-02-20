@@ -186,6 +186,8 @@ class Character(GameElement):
 
 def initialize():
     """Put game initialization code here"""
+    # Read and generate the map.
+    GAME_BOARD.read_map('SF_map.txt')
 
     rock_positions = [
     (2, 1),
@@ -234,8 +236,8 @@ def initialize():
             upper_half_y = randint(0, 3)
             existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
         GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
-        print "BLUEBOTTLE"
 
+        
     # GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
     # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
     # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
