@@ -8,12 +8,8 @@ from random import randint
 
 """
 Navigate the map to collect sustenance for starving Hackbright students. 
-Hackbright Academy will not welcome you inside unless you have acquired enough food.
+Hackbright Academy will not welcome you inside unless you have acquired proper sustenance.
 """
-
-
-# Wait, you forgot to pick up gluten free options! Shannon and Cynthia send you back out. 
-# -- then new/old options will appear
 
 #### DO NOT TOUCH ####
 GAME_BOARD = None
@@ -38,12 +34,41 @@ class BB(GameElement):
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("You just acquired BlueBottle Coffee! You have %d items!" % (len(player.inventory)))
+    def __repr__(self):
+        return "BlueBottle Coffee"
 
 class Sibbys(GameElement):
     IMAGE = "Sibbys"
+    SOLID = True
+    # GAME_BOARD.entities['sibbys_encounter'] = True
+
     def interact(self, player):
-            player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just acquired Sibby's cupcakes! You make sure to pick up some gluten-free options. You have %d items!" % (len(player.inventory)))
+        GAME_BOARD.entities['sibbys_encounter'] += 1
+
+    def conversation(self, player, choice):
+
+        if GAME_BOARD.entities['sibbys_encounter'] == 1:
+
+            GAME_BOARD.draw_msg("\"Hello, welcome to Sibby's Cupcakery! What would you like?\"" + unichr(10) + "A. One dozen red velvet cupcakes, please!" + unichr(10) + "B. Do you have anything gluten-free?")
+            
+            if GAME_BOARD.entities['choice'] == 'a':
+                player.inventory.append(self)
+                GAME_BOARD.draw_msg("You acquire one dozen red velvet cupcakes.")
+                GAME_BOARD.entities['sibbys_encounter'] += 1
+            elif GAME_BOARD.entities['choice'] == 'b':
+                player.inventory.append(self)
+                GAME_BOARD.draw_msg("You acquire one dozen gluten-free cupcakes.")
+                GAME_BOARD.entities['sibbys_encounter'] += 1
+        else:
+            GAME_BOARD.draw_msg("\"Enjoy your cupcakes!\"")
+
+    def __repr__(self):
+        return "Sibby's Cupcakes"
+            
+
+    # def interact(self, player):
+    #         player.inventory.append(self)
+    #         GAME_BOARD.draw_msg("You just acquired Sibby's cupcakes! You make sure to pick up some gluten-free options. You have %d items!" % (len(player.inventory)))
 
 class Sushi(GameElement):
     IMAGE = "Sushi"
@@ -74,7 +99,19 @@ class HB(GameElement):
         elif 5 <= len(PLAYER.inventory) < 6:
             if GAME_BOARD.entities['more food'] == 1:
                 GAME_BOARD.draw_msg("Wait, you forgot about Shannon's, Renee's, and Cynthia's gluten alleries! You can't leave them to starve.")
-                GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+               
+                upper_half_x = randint(0, GAME_WIDTH - 1)
+                upper_half_y = randint(0, 3)
+                existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
+            # if something already exists in target coordinates, generate new target coordinate
+            # this continues until an empty space is generated
+                while existing_el:
+                    upper_half_x = randint(0, GAME_WIDTH - 1)
+                    upper_half_y = randint(0, 3)
+                    existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
+                GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
+
+
                 GAME_BOARD.entities['more food'] += 1
 
         elif 6 <= len(PLAYER.inventory) < 7:
@@ -120,12 +157,18 @@ class Cart(GameElement):
                 GAME_BOARD.del_el(self.x, self.y)
                 GAME_BOARD.set_el(next_x, next_y, self)
 
+    def __repr__(self):
+        return "Creme Brulee"
+
 class Money(GameElement):
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("You just found some money! You can now cross the Golden Gate Bridge!")
     IMAGE = "BlueGem"
     SOLID = False
+
+    def __repr__(self):
+        return "Fast Pass"
 
 
 class Character(GameElement):
@@ -218,8 +261,10 @@ def initialize():
     CART_TIMER = 0 
     GAME_BOARD.entities['cb_cart_timer'] = CART_TIMER
 
-    sibbys = Sibbys()
-    GAME_BOARD.register(sibbys)
+    GAME_BOARD.entities['sibbys'] = Sibbys()
+    GAME_BOARD.register(GAME_BOARD.entities['sibbys'])
+    GAME_BOARD.entities['sibbys_encounter'] = 0
+    GAME_BOARD.entities['choice'] = 'initializer string'
 
     sushi = Sushi()
     GAME_BOARD.register(sushi)
@@ -235,6 +280,7 @@ def initialize():
             upper_half_x = randint(0, GAME_WIDTH - 1)
             upper_half_y = randint(0, 3)
             existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
+        print i    
         GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
 
         
@@ -246,14 +292,18 @@ def initialize():
 
     # need to fix .png image size
     # GAME_BOARD.set_el(5, 8, sushi)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)
+
+
+
+
+    GAME_BOARD.set_el(8, 7, GAME_BOARD.entities['sibbys'])
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), cb_cart)
 
     # more_food in case for some reason not enough initial food generated
     GAME_BOARD.entities['more food'] = True
     # have you generated the bridge toll cash? 
     GAME_BOARD.entities['bridge toll given'] = False
-
 
     hackbright = HB()
     GAME_BOARD.register(hackbright)
@@ -284,7 +334,15 @@ def initialize():
 def keyboard_handler():
     direction = None
 
-    if KEYBOARD[key.UP]:
+    if GAME_BOARD.entities['sibbys_encounter'] == 1:
+        if KEYBOARD[key.A]:
+            GAME_BOARD.entities['choice'] = "a"
+        elif KEYBOARD[key.B]:
+            GAME_BOARD.entities['choice'] = "b"
+        # need to pass on the choice
+        GAME_BOARD.entities['sibbys'].conversation(PLAYER, GAME_BOARD.entities['choice'])
+
+    elif KEYBOARD[key.UP]:
         direction = "up"
 
     elif KEYBOARD[key.DOWN]:
@@ -299,6 +357,7 @@ def keyboard_handler():
     elif KEYBOARD[key.I]:
         GAME_BOARD.erase_msg()
         GAME_BOARD.draw_msg("Inventory: %s" % PLAYER.inventory)
+
 
     if direction: 
         next_location = PLAYER.next_pos(direction)
