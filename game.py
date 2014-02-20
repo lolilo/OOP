@@ -25,8 +25,8 @@ GAME_HEIGHT = 9
 # water all across 4
 
 #### Put class definitions here ####
-class Rock(GameElement):
-    IMAGE = "Rock"
+class Building(GameElement):
+    IMAGE = "Building"
     SOLID = True
 
 class BB(GameElement):
@@ -110,7 +110,6 @@ class HB(GameElement):
                     upper_half_y = randint(0, 3)
                     existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
                 GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
-
 
                 GAME_BOARD.entities['more food'] += 1
 
@@ -232,18 +231,15 @@ def initialize():
     # Read and generate the map.
     GAME_BOARD.read_map('SF_map.txt')
 
-    rock_positions = [
-    (2, 1),
-    (1, 2),
-    (3, 2)
-    ]
-
-    rocks = []
-
 ########## IMAGES ############
 
     # GAME_BOARD is global, so all its attributes are available globally via GAME_BOARD
     GAME_BOARD.entities = {}
+
+    GAME_BOARD.entities['building'] = Building()
+    GAME_BOARD.register(GAME_BOARD.entities['building'])
+    GAME_BOARD.set_el(4, 0, GAME_BOARD.entities['building'])
+
 
     GAME_BOARD.entities['bluebottle'] = BB()
     GAME_BOARD.register(GAME_BOARD.entities['bluebottle'])
@@ -280,7 +276,7 @@ def initialize():
             upper_half_x = randint(0, GAME_WIDTH - 1)
             upper_half_y = randint(0, 3)
             existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
-        print i    
+        print i, upper_half_x, upper_half_y
         GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
 
         
@@ -292,9 +288,6 @@ def initialize():
 
     # need to fix .png image size
     # GAME_BOARD.set_el(5, 8, sushi)
-
-
-
 
     GAME_BOARD.set_el(8, 7, GAME_BOARD.entities['sibbys'])
     # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)

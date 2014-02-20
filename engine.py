@@ -50,6 +50,7 @@ def setup_images():
             "Philz": "philz.jpg",
             "CremeBrulee": "CB_cart.png",
 
+            "Building": "Rock.png",
             "HB": 'HB.png'
             }
 
