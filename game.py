@@ -157,6 +157,7 @@ class HB(GameElement):
             GAME_BOARD.read_map('HB_map.txt')
             GAME_BOARD.set_el(7, 7, GAME_BOARD.entities['balloonicorn'])
             GAME_BOARD.draw_msg("You collected enough food for Hackbright's dietary restrictions, and they welcome you inside. Congratulations!")
+            GAME_BOARD.entities['GG_bridge_message'] = False
 
 class Cart(GameElement):
     IMAGE = "CremeBrulee"
@@ -240,11 +241,14 @@ class Character(GameElement):
         bridge_toll = True
         if next_x == 2 and next_y == 4:
             # print self.inventory
-            if GAME_BOARD.entities['cash'] in self.inventory:
-                GAME_BOARD.draw_msg("You crossed the Golden Gate Bridge!")
-            else: 
-                GAME_BOARD.draw_msg("You need to pay bridge toll in order to cross the Golden Gate Bridge.")
-                bridge_toll = False
+
+            if GAME_BOARD.entities['GG_bridge_message']:
+
+                if GAME_BOARD.entities['cash'] in self.inventory:
+                    GAME_BOARD.draw_msg("You crossed the Golden Gate Bridge!")
+                else: 
+                    GAME_BOARD.draw_msg("You need to pay bridge toll in order to cross the Golden Gate Bridge.")
+                    bridge_toll = False
         
         # if boundary_boolean:
         #     print "It's going to break! Don't move!"
@@ -275,6 +279,8 @@ def initialize():
 
     # GAME_BOARD is global, so all its attributes are available globally via GAME_BOARD
     GAME_BOARD.entities = {}
+
+    GAME_BOARD.entities['GG_bridge_message'] = True
 
     GAME_BOARD.entities['building'] = Building()
     GAME_BOARD.register(GAME_BOARD.entities['building'])
