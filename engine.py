@@ -43,15 +43,21 @@ def setup_images():
             "Girl": "Character Pink Girl.png",
             "Princess": "Character Princess Girl.png",
 
+            "BrownBlock": "Brown Block.png",
             "GG": "gg_bridge_with_water.png",
+            "Building": "TPyramid.png",
+            "HB": 'HB.png',
+            "Balloonicorn": "balloonicorn.png",
+
             "BB": "BB_Coffee.png",
-            "Sushi": "sushirrito.png",
+            "Sushi": "Sushirrito.png",
             "Sibbys": "sibbys.png",
             "Philz": "philz.jpg",
             "CremeBrulee": "CB_cart.png",
+            "Kow": "Kow.png",
+            "Ikes": "Ikes.png",
+            "InNOut": "InNOut.png"
 
-            "Building": "Rock.png",
-            "HB": 'HB.png'
             }
 
     for k,v in filenames.items():
@@ -94,12 +100,6 @@ class Board(object):
 
 
 
-
-
-
-
-
-
     #This would make a great "read level" function
     # map_title will be SF_map.txt and others
     def read_map(self, map_title):
@@ -110,12 +110,15 @@ class Board(object):
             for item in range(len(line)):
                 if line[item] == 's':
                     row = row + ["Block"]
-                if line[item] == 'w':
+                elif line[item] == 'w':
                     row = row + ["WaterBlock"]
-                if line[item] == '.':
+                elif line[item] == '.':
                     row = row + ["GrassBlock"]
-                if line[item] == 'b':
+                elif line[item] == 'b':
                     row = row + ["GG"]
+
+                elif line[item] == 'f': # f for floor
+                    row = row + ["BrownBlock"]
             game_map.append(row)
         f.close()
 

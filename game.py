@@ -33,9 +33,17 @@ class BB(GameElement):
     IMAGE = "BB"
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just acquired BlueBottle Coffee! You have %d items!" % (len(player.inventory)))
+            GAME_BOARD.draw_msg("BlueBottle Coffee! Nice! You have %d items!" % (len(player.inventory)))
     def __repr__(self):
         return "BlueBottle Coffee"
+
+class Balloon(GameElement):
+    IMAGE = "Balloonicorn"
+    SOLID = True
+
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg('Baloonicorn says, "Thanks for all the food!"')
 
 class Sibbys(GameElement):
     IMAGE = "Sibbys"
@@ -77,10 +85,31 @@ class Sushi(GameElement):
             GAME_BOARD.draw_msg("Whoa, you waited in that Sushirrito line?! Dang. You have %d items!" % (len(player.inventory)))
 
 
+class Ikes(GameElement):
+    IMAGE = "Ikes"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("I like Ike's! You have %d items!" % (len(player.inventory)))
+
+class Kow(GameElement):
+    IMAGE = "Kow"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("Oh, Purple Kow~ What large boba cups you have. You have %d items!" % (len(player.inventory)))
+
+class InNOut(GameElement):
+    IMAGE = "InNOut"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("In-N-Out! California staple. You have %d items!" % (len(player.inventory)))
+
+
 # Could also combine the following to a single class "Obstacle" or something. 
 # Change image by self.IMAGE = 'HB' after instantiating with HB = Obstacle()
-class GG_Bridge(GameElement):
-    IMAGE = "GG"
+
+# made the bridge a background element
+# class GG_Bridge(GameElement):
+#     IMAGE = "GG"
 
 class HB(GameElement):
     IMAGE = "HB"
@@ -92,6 +121,8 @@ class HB(GameElement):
     # if at Hackbright, check your inventory
         if len(PLAYER.inventory) < 5:
             GAME_BOARD.draw_msg("You have not gathered enough food. Hackbright students need more!")
+            
+            # in case initial random spawn fails -- spawns on top of exiting item
             if GAME_BOARD.entities['more food'] == 0 and len(PLAYER.inventory) > 3:
                 GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
                 GAME_BOARD.entities['more food'] = 1
@@ -113,13 +144,19 @@ class HB(GameElement):
 
                 GAME_BOARD.entities['more food'] += 1
 
-        elif 6 <= len(PLAYER.inventory) < 7:
+        elif (6 <= len(PLAYER.inventory) < 7):
             GAME_BOARD.draw_msg("Oh wait, Abigail and Liz are vegan...they won't let you in unless you bring them vegan food. :(")
             if not GAME_BOARD.entities['bridge toll given']:
                 GAME_BOARD.set_el(self.x + 6, self.y + 1, GAME_BOARD.entities['cash'])
                 GAME_BOARD.entities['bridge toll given'] = True
-        else:
-            GAME_BOARD.draw_msg("You collected enough food for Hackbright to welcome you in. Congratulations!")
+
+        elif len(PLAYER.inventory) > 8:
+            
+
+            # change map test
+            GAME_BOARD.read_map('HB_map.txt')
+            GAME_BOARD.set_el(7, 7, GAME_BOARD.entities['balloonicorn'])
+            GAME_BOARD.draw_msg("You collected enough food for Hackbright's dietary restrictions, and they welcome you inside. Congratulations!")
 
 class Cart(GameElement):
     IMAGE = "CremeBrulee"
@@ -162,7 +199,7 @@ class Cart(GameElement):
 class Money(GameElement):
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("You just found some money! You can now cross the Golden Gate Bridge!")
+            GAME_BOARD.draw_msg("You just found a Fast Pass! You can now cross the Golden Gate Bridge!")
     IMAGE = "BlueGem"
     SOLID = False
 
@@ -199,6 +236,7 @@ class Character(GameElement):
         # on_water returns True if player is about to move onto water
         on_water = next_x != 2 and next_y == 4
 
+        # Is there a better place I can put this block of code? 
         bridge_toll = True
         if next_x == 2 and next_y == 4:
             # print self.inventory
@@ -233,6 +271,8 @@ def initialize():
 
 ########## IMAGES ############
 
+    foods = []
+
     # GAME_BOARD is global, so all its attributes are available globally via GAME_BOARD
     GAME_BOARD.entities = {}
 
@@ -240,10 +280,28 @@ def initialize():
     GAME_BOARD.register(GAME_BOARD.entities['building'])
     GAME_BOARD.set_el(4, 0, GAME_BOARD.entities['building'])
 
-
     GAME_BOARD.entities['bluebottle'] = BB()
     GAME_BOARD.register(GAME_BOARD.entities['bluebottle'])
+    foods.append(GAME_BOARD.entities['bluebottle'])
+
+    Ikes_sandwich = Ikes()
+    GAME_BOARD.register(Ikes_sandwich)
+    foods.append(Ikes_sandwich)
     
+    Kow_boba = Kow()
+    GAME_BOARD.register(Kow_boba)
+    foods.append(Kow_boba)
+
+    InNOut_order = InNOut()
+    GAME_BOARD.register(InNOut_order)
+    foods.append(InNOut_order)
+
+    Sushirrito = Sushi()
+    GAME_BOARD.register(Sushirrito)
+    foods.append(Sushirrito)
+
+    GAME_BOARD.entities['balloonicorn'] = Balloon()
+    GAME_BOARD.register(GAME_BOARD.entities['balloonicorn'])
 
     # instead of having a bunch of global variables, store them all in a dictionary 
     # This way, it can easily be passed, destroyed, or otherwise managed
@@ -262,11 +320,10 @@ def initialize():
     GAME_BOARD.entities['sibbys_encounter'] = 0
     GAME_BOARD.entities['choice'] = 'initializer string'
 
-    sushi = Sushi()
-    GAME_BOARD.register(sushi)
+
 
     # need to make sure items don't spawn on top of each other
-    for i in range(5):
+    for i in foods:
         upper_half_x = randint(0, GAME_WIDTH - 1)
         upper_half_y = randint(0, 3)
         existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
@@ -277,7 +334,7 @@ def initialize():
             upper_half_y = randint(0, 3)
             existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
         print i, upper_half_x, upper_half_y
-        GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
+        GAME_BOARD.set_el(upper_half_x, upper_half_y, i)
 
         
     # GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
@@ -320,7 +377,7 @@ def initialize():
     GAME_BOARD.set_el(2, 2, PLAYER)
     print 'this is player', PLAYER
 
-    welcome_message = "Your friends at Hackbright Academy have been coding all day and are now starving! You decide to trek out and fetch food for everyone."
+    welcome_message = "Your friends at Hackbright Academy have been coding all day and are now starving! You decide to trek out and fetch food for everyone. Press 'i' to check your collected items."
     GAME_BOARD.draw_msg(welcome_message)    
 
 
