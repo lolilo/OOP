@@ -160,13 +160,11 @@ class Character(GameElement):
         bridge_toll = True
         if next_x == 2 and next_y == 4:
             # print self.inventory
-            # cash is a gloal variable
             if GAME_BOARD.entities['cash'] in self.inventory:
                 GAME_BOARD.draw_msg("You crossed the Golden Gate Bridge!")
             else: 
                 GAME_BOARD.draw_msg("You need to pay bridge toll in order to cross the Golden Gate Bridge.")
                 bridge_toll = False
-
         
         # if boundary_boolean:
         #     print "It's going to break! Don't move!"
@@ -184,7 +182,6 @@ class Character(GameElement):
         
         return (self.x, self.y)
 
-   
 ####   End class definitions    ####
 
 def initialize():
@@ -225,14 +222,26 @@ def initialize():
     sushi = Sushi()
     GAME_BOARD.register(sushi)
 
-    upper_half_x = randint(0, GAME_WIDTH - 1)
-    upper_half_y = randint(0, 3)
+    # need to make sure items don't spawn on top of each other
+    for i in range(5):
+        upper_half_x = randint(0, GAME_WIDTH - 1)
+        upper_half_y = randint(0, 3)
+        existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
+    # if something already exists in target coordinates, generate new target coordinate
+    # this continues until an empty space is generated
+        while existing_el:
+            upper_half_x = randint(0, GAME_WIDTH - 1)
+            upper_half_y = randint(0, 3)
+            existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
+        GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
+        print "BLUEBOTTLE"
 
-    GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
-    GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+    # GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), GAME_BOARD.entities['bluebottle'])
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+    # GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(0, 3), sibbys)
+
     # need to fix .png image size
     # GAME_BOARD.set_el(5, 8, sushi)
     GAME_BOARD.set_el(randint(0, GAME_WIDTH - 1), randint(5, GAME_HEIGHT - 1), sibbys)
@@ -302,7 +311,6 @@ def keyboard_handler():
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
             GAME_BOARD.set_el(next_x, next_y, PLAYER)
 
-
     mod_divisor = 8
     GAME_BOARD.entities['cb_cart_timer'] += 1
     if GAME_BOARD.entities['cb_cart_timer'] % mod_divisor == 0 and GAME_BOARD.entities['cb_cart_moving']:
@@ -310,9 +318,6 @@ def keyboard_handler():
 
     # elif KEYBOARD[key.SPACE]:
     #     GAME_BOARD.erase_msg()
-
-
-
 
 # def keyboard_handler():
 #     if KEYBOARD[key.UP]:
@@ -341,7 +346,6 @@ def keyboard_handler():
 
 #     elif KEYBOARD[key.SPACE]:
 #         GAME_BOARD.erase_msg()
-
 
     # GAME_BOARD.erase_msg()
 

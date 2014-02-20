@@ -90,8 +90,20 @@ class Board(object):
         #         row = ["Block"] + (["GrassBlock"] * inner_width) + ["Block"]
         #         game_map.append(row)
 
+
+
+
+
+
+
+
+
+
+        #This would make a great "read level" function
+        # map_title will be SF_map.txt and others
+        # def read_map(self, map_title):
         game_map = []
-        f = open("SF_map.txt")
+        f = open('SF_map.txt')
         for line in f:
             row = []
             for item in range(len(line)):
@@ -107,7 +119,6 @@ class Board(object):
         f.close()
         
 
-        # for some reason, the map does not generate the last row. Off by one error somewhere?
         self.base_board = game_map
         self.content_layer = []
         row = [ None ] * width
@@ -118,8 +129,13 @@ class Board(object):
         # self.message = pyglet.text.Label(text = "", x=10, y=SCREEN_Y-30)
         self.bg_sprites = []
 
+
+
+
+        # This would make a great "draw background" function - this is what generates the map tiles
         for y in range(height):
             for x in range(width):
+                # game_map is a list of lists - y is the row, x is the index of the column
                 img_idx = game_map[y][x]
                 image = IMAGES[img_idx]
 
