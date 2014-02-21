@@ -83,25 +83,32 @@ class Sushi(GameElement):
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("Whoa, you waited in that Sushirrito line?! Dang. You have %d items!" % (len(player.inventory)))
-
+    def __repr__(self):
+        return "Sushirrito"
 
 class Ikes(GameElement):
     IMAGE = "Ikes"
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("I like Ike's! You have %d items!" % (len(player.inventory)))
+    def __repr__(self):
+        return "Ike's Sandwich"
 
 class Kow(GameElement):
     IMAGE = "Kow"
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("Oh, Purple Kow~ What large boba cups you have. You have %d items!" % (len(player.inventory)))
+    def __repr__(self):
+        return "Purple Kow Boba"
 
 class InNOut(GameElement):
     IMAGE = "InNOut"
     def interact(self, player):
             player.inventory.append(self)
-            GAME_BOARD.draw_msg("In-N-Out! California staple. You have %d items!" % (len(player.inventory)))
+            GAME_BOARD.draw_msg("In-N-Out! A California staple. You have %d items!" % (len(player.inventory)))
+    def __repr__(self):
+        return "In-N-Out Burger"
 
 
 # Could also combine the following to a single class "Obstacle" or something. 
