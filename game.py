@@ -37,6 +37,14 @@ class BB(GameElement):
     def __repr__(self):
         return "BlueBottle Coffee"
 
+class Philz(GameElement):
+    IMAGE = "Philz"
+    def interact(self, player):
+            player.inventory.append(self)
+            GAME_BOARD.draw_msg("Philz Coffee! Awesome! You have %d items!" % (len(player.inventory)))
+    def __repr__(self):
+        return "Philz Coffee"
+
 class Balloon(GameElement):
     IMAGE = "Balloonicorn"
     SOLID = True
@@ -147,7 +155,14 @@ class HB(GameElement):
                     upper_half_x = randint(0, GAME_WIDTH - 1)
                     upper_half_y = randint(0, 3)
                     existing_el = GAME_BOARD.get_el(upper_half_x, upper_half_y)
-                GAME_BOARD.set_el(upper_half_x, upper_half_y, GAME_BOARD.entities['bluebottle'])
+
+
+                philz_coffee = Philz()
+                GAME_BOARD.register(philz_coffee)
+
+                # foods global variable? 
+                foods.append(philz_coffee)
+                GAME_BOARD.set_el(upper_half_x, upper_half_y, philz_coffee)
 
                 GAME_BOARD.entities['more food'] += 1
 
@@ -208,7 +223,7 @@ class Money(GameElement):
     def interact(self, player):
             player.inventory.append(self)
             GAME_BOARD.draw_msg("You just found a Fast Pass! You can now cross the Golden Gate Bridge!")
-    IMAGE = "BlueGem"
+    IMAGE = "FasTrak"
     SOLID = False
 
     def __repr__(self):
@@ -281,8 +296,10 @@ def initialize():
     GAME_BOARD.read_map('SF_map.txt')
 
 ########## IMAGES ############
+    
 
     foods = []
+    global foods
 
     # GAME_BOARD is global, so all its attributes are available globally via GAME_BOARD
     GAME_BOARD.entities = {}

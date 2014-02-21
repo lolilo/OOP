@@ -56,7 +56,9 @@ def setup_images():
             "CremeBrulee": "CB_cart.png",
             "Kow": "Kow.png",
             "Ikes": "Ikes.png",
-            "InNOut": "InNOut.png"
+            "InNOut": "InNOut.png",
+            "Philz": "Philz.png",
+            "FasTrak": "FasTrak.png"
 
             }
 
